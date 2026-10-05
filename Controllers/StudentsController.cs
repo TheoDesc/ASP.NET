@@ -14,7 +14,6 @@ namespace StudentManager.Controllers
             _context = context;
         }
 
-        // READ : liste
         public async Task<IActionResult> Index()
         {
             var students = await _context.Students
@@ -24,8 +23,7 @@ namespace StudentManager.Controllers
             return View(students);
         }
 
-        // CREATE
-        public IActionResult Create() => View();
+        public IActionResult Create() => View(new Student());
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Student student)
@@ -38,7 +36,6 @@ namespace StudentManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // UPDATE
         public async Task<IActionResult> Edit(Guid id)
         {
             var student = await _context.Students.FindAsync(id);
@@ -48,4 +45,30 @@ namespace StudentManager.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Student student)
         {
-            if (id != student.Id) return
+            if (id != student.Id) return BadRequest();
+            if (!ModelState.IsValid) return View(student);
+
+            _context.Students.Update(student);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            return student is null ? NotFound() : View(student);
+        }
+
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student is not null)
+            {
+                _context.Students.Remove(student);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}
