@@ -1,0 +1,15 @@
+﻿@model StudentManager.Models.Entities.Student
+@{
+    ViewData["Title"] = "Modifier l'étudiant";
+}
+
+<h1>Modifier l'étudiant</h1>
+<form asp-action="Edit" method="post">
+    <partial name="_StudentForm" model="Model" />
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
