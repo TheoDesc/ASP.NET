@@ -1,14 +1,23 @@
-﻿namespace StudentManager.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StudentManager.Models.Entities
 {
     public class Student
     {
-        public Guid Id {  set; get; }
-        public string Name { set; get; }
+        public Guid Id { get; set; }
 
-        public string Email { set; get; }
+        [Required, StringLength(100)]
+        [Display(Name = "Nom")]
+        public string Name { get; set; } = string.Empty;
 
-        public string Phone { set; get; }
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
-        public string Subscribed { set; get; }
+        [Required, Phone]
+        [Display(Name = "Téléphone")]
+        public string Phone { get; set; } = string.Empty;
+
+        [Display(Name = "Abonné")]
+        public bool Subscribed { get; set; }
     }
 }
