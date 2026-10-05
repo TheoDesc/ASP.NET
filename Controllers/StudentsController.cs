@@ -1,26 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StudentManager.Data;
 using StudentManager.Models.Entities;
+using StudentManager.Services;
 
 namespace StudentManager.Controllers
 {
     public class StudentsController : Controller
     {
-        private readonly StudentContext _context;
+        private readonly IStudentService _studentService;
 
-        public StudentsController(StudentContext context)
+        public StudentsController(IStudentService studentService)
         {
-            _context = context;
+            _studentService = studentService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var students = await _context.Students
-                .AsNoTracking()
-                .OrderBy(s => s.Name)
-                .ToListAsync();
-            return View(students);
+            return View(await _studentService.GetAllAsync());
         }
 
         public IActionResult Create() => View(new Student());
@@ -30,15 +25,13 @@ namespace StudentManager.Controllers
         {
             if (!ModelState.IsValid) return View(student);
 
-            student.Id = Guid.NewGuid();
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
+            await _studentService.CreateAsync(student);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            var student = await _context.Students.FindAsync(id);
+            var student = await _studentService.GetByIdAsync(id);
             return student is null ? NotFound() : View(student);
         }
 
@@ -48,26 +41,14 @@ namespace StudentManager.Controllers
             if (id != student.Id) return BadRequest();
             if (!ModelState.IsValid) return View(student);
 
-            _context.Students.Update(student);
-            await _context.SaveChangesAsync();
+            await _studentService.UpdateAsync(student);
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var student = await _context.Students.FindAsync(id);
-            return student is null ? NotFound() : View(student);
-        }
-
-        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var student = await _context.Students.FindAsync(id);
-            if (student is not null)
-            {
-                _context.Students.Remove(student);
-                await _context.SaveChangesAsync();
-            }
+            await _studentService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

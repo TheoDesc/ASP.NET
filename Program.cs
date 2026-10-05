@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StudentManager.Data;
+using StudentManager.Services;
 
 public partial class Program
 {
@@ -12,6 +13,7 @@ public partial class Program
         builder.Services.AddDbContext<StudentContext>(options =>
             options.UseSqlite(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddScoped<IStudentService, StudentService>();
 
         var app = builder.Build();
 
