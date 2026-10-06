@@ -1,0 +1,71 @@
+﻿@model IEnumerable<StudentManager.Models.ViewModels.UserRoleViewModel>
+@{
+    ViewData["Title"] = "Utilisateurs";
+    var currentEmail = User.Identity?.Name;
+}
+
+<div class="page-header fade-up">
+    <div>
+        <h1>Utilisateurs</h1>
+        <p class="text-body-secondary mb-0">Gérez les rôles des comptes de l'application.</p>
+    </div>
+</div>
+
+<div class="app-card fade-up delay-1">
+    <div class="table-responsive">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Rôle</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    var label = string.IsNullOrWhiteSpace(u.FullName) ? u.Email : u.FullName;
+                    var initial = string.IsNullOrWhiteSpace(label) ? "?" : label.Substring(0, 1).ToUpperInvariant();
+                    var isMe = string.Equals(u.Email, currentEmail, StringComparison.OrdinalIgnoreCase);
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="avatar avatar-0">@initial</span>
+                                <div>
+                                    <div class="fw-semibold">@label@(isMe ? " (vous)" : "")</div>
+                                    <div class="small text-body-secondary">@u.Email</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @if (u.IsAdmin)
+                            {
+                                <span class="badge-soft success"><i class="bi bi-shield-check"></i>Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge-soft muted"><i class="bi bi-person"></i>User</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (!isMe)
+                            {
+                                <form asp-action="ToggleAdmin" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    @if (u.IsAdmin)
+                                    {
+                                        <button type="submit" class="btn btn-ghost btn-sm">Rétrograder en User</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-brand btn-sm">Promouvoir Admin</button>
+                                    }
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

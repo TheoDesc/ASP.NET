@@ -6,6 +6,7 @@
     string displayName = User.Identity?.Name ?? string.Empty;
     string initial = "?";
     var signedIn = SignInManager.IsSignedIn(User);
+    var isAdmin = signedIn && User.IsInRole("Admin");
 
     if (signedIn)
     {
@@ -23,9 +24,19 @@
 
 @if (signedIn)
 {
+    @if (isAdmin)
+    {
+        <a class="btn btn-ghost btn-sm" asp-controller="Users" asp-action="Index">
+            <i class="bi bi-person-gear me-1"></i>Utilisateurs
+        </a>
+    }
     <div class="user-pill">
         <span class="avatar avatar-sm avatar-0">@initial</span>
         <span class="d-none d-sm-inline">@displayName</span>
+        @if (isAdmin)
+        {
+            <span class="badge text-bg-primary">Admin</span>
+        }
     </div>
     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
         <button type="submit" class="btn btn-ghost btn-sm">
