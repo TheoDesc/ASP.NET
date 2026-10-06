@@ -8,3 +8,5 @@ namespace StudentManager.Models.Entities
         public string LastName { get; set; } = string.Empty;
     }
 }
+
+//test
