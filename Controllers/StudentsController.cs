@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudentManager.Models.Entities;
 using StudentManager.Services;
 
@@ -18,8 +19,10 @@ namespace StudentManager.Controllers
             return View(await _studentService.GetAllAsync());
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create() => View(new Student());
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Student student)
         {
@@ -30,12 +33,14 @@ namespace StudentManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid id)
         {
             var student = await _studentService.GetByIdAsync(id);
             return student is null ? NotFound() : View(student);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Student student)
         {
@@ -47,6 +52,7 @@ namespace StudentManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {

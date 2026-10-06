@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using StudentManager.Services;
 
 public partial class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -35,12 +35,17 @@ public partial class Program
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = "/Account/Login";
-            options.AccessDeniedPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
         });
 
         builder.Services.AddScoped<IStudentService, StudentService>();
 
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            await IdentitySeeder.SeedAsync(scope.ServiceProvider);
+        }
 
         if (!app.Environment.IsDevelopment())
         {
@@ -61,6 +66,6 @@ public partial class Program
             pattern: "{controller=Home}/{action=Index}/{id?}")
             .WithStaticAssets();
 
-        app.Run();
+        await app.RunAsync();
     }
 }

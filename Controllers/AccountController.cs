@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using StudentManager.Data;
 using StudentManager.Models.Entities;
 using StudentManager.Models.ViewModels;
 
@@ -70,6 +71,7 @@ namespace StudentManager.Controllers
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, IdentitySeeder.UserRole);
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             }
@@ -86,6 +88,12 @@ namespace StudentManager.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }
