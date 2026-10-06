@@ -12,6 +12,8 @@ namespace StudentManager.Data
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var configuration = services.GetRequiredService<IConfiguration>();
+            var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("IdentitySeeder");
 
             foreach (var role in new[] { AdminRole, UserRole })
             {
@@ -21,8 +23,14 @@ namespace StudentManager.Data
                 }
             }
 
-            const string adminEmail = "admin@studentmanager.fr";
-            const string adminPassword = "Admin123!";
+            var adminEmail = configuration["AdminAccount:Email"];
+            var adminPassword = configuration["AdminAccount:Password"];
+
+            if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
+            {
+                logger.LogWarning("AdminAccount:Email ou AdminAccount:Password non configuré : aucun compte admin créé.");
+                return;
+            }
 
             if (await userManager.FindByEmailAsync(adminEmail) is null)
             {
@@ -39,6 +47,11 @@ namespace StudentManager.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(admin, AdminRole);
+                }
+                else
+                {
+                    logger.LogError("Création du compte admin impossible : {Errors}",
+                        string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
         }
