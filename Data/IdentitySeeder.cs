@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using StudentManager.Models.Entities;
+using Environment = System.Environment;
 
 namespace StudentManager.Data
 {
@@ -22,7 +23,12 @@ namespace StudentManager.Data
             }
 
             const string adminEmail = "admin@studentmanager.fr";
-            const string adminPassword = "Admin123!";
+            string? adminPassword = Environment.GetEnvironmentVariable("adminPassword");
+
+            if (string.IsNullOrWhiteSpace(adminPassword))
+            {
+                throw new System.InvalidOperationException("La variable d'environnement 'adminPassword' n'est pas définie.");
+            }
 
             if (await userManager.FindByEmailAsync(adminEmail) is null)
             {
