@@ -1,34 +1,182 @@
 ﻿@model IEnumerable<StudentManager.Models.Entities.Student>
+@functions {
+    static string Initials(string? name)
+    {
+        var parts = (name ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length == 0) return "?";
+        if (parts.Length == 1) return parts[0].Substring(0, 1).ToUpperInvariant();
+        return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpperInvariant();
+    }
+}
 @{
     ViewData["Title"] = "Étudiants";
+    var students = Model.ToList();
+    var total = students.Count;
+    var subscribed = students.Count(s => s.Subscribed);
+    var notSubscribed = total - subscribed;
 }
 
-<h1>Liste des étudiants</h1>
-<a asp-action="Create" class="btn btn-primary mb-3">Ajouter un étudiant</a>
+<div class="page-header fade-up">
+    <div>
+        <h1>Étudiants</h1>
+        <p class="text-body-secondary mb-0">Gérez votre liste d'étudiants en un coup d'oeil.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i>Ajouter un étudiant</a>
+</div>
 
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.Name)</th>
-            <th>@Html.DisplayNameFor(m => m.Email)</th>
-            <th>@Html.DisplayNameFor(m => m.Phone)</th>
-            <th>@Html.DisplayNameFor(m => m.Subscribed)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var s in Model)
-        {
-            <tr>
-                <td>@s.Name</td>
-                <td>@s.Email</td>
-                <td>@s.Phone</td>
-                <td>@(s.Subscribed ? "Oui" : "Non")</td>
-                <td class="text-end">
-                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-warning">Modifier</a>
-                    <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Supprimer</a>
-                </td>
-            </tr>
+<div class="row g-3 mb-4">
+    <div class="col-md-4 fade-up delay-1">
+        <div class="app-card stat-card">
+            <span class="stat-icon indigo"><i class="bi bi-people-fill"></i></span>
+            <div><div class="stat-value">@total</div><div class="stat-label">Étudiants</div></div>
+        </div>
+    </div>
+    <div class="col-md-4 fade-up delay-2">
+        <div class="app-card stat-card">
+            <span class="stat-icon green"><i class="bi bi-envelope-check-fill"></i></span>
+            <div><div class="stat-value">@subscribed</div><div class="stat-label">Abonnés</div></div>
+        </div>
+    </div>
+    <div class="col-md-4 fade-up delay-3">
+        <div class="app-card stat-card">
+            <span class="stat-icon amber"><i class="bi bi-envelope-slash-fill"></i></span>
+            <div><div class="stat-value">@notSubscribed</div><div class="stat-label">Non abonnés</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="app-card fade-up delay-2">
+    @if (total == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-people"></i></div>
+            <h5 class="fw-bold">Aucun étudiant pour le moment</h5>
+            <p class="text-body-secondary mb-4">Commencez par ajouter votre premier étudiant.</p>
+            <a asp-action="Create" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i>Ajouter un étudiant</a>
+        </div>
+    }
+    else
+    {
+        <div class="app-card-header">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input id="studentSearch" type="search" class="form-control"
+                       placeholder="Rechercher par nom, email ou téléphone" autocomplete="off" />
+            </div>
+            <span class="text-body-secondary small"><span id="resultCount">@total</span> résultat(s)</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-modern">
+                <thead>
+                    <tr>
+                        <th>Étudiant</th>
+                        <th class="d-none d-lg-table-cell">Téléphone</th>
+                        <th>Abonnement</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < students.Count; i++)
+                    {
+                        var s = students[i];
+                        var tone = $"avatar-{i % 5}";
+                        var search = $"{s.Name} {s.Email} {s.Phone}".ToLowerInvariant();
+                        <tr class="student-row" data-search="@search">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="avatar @tone">@Initials(s.Name)</span>
+                                    <div>
+                                        <div class="fw-semibold">@s.Name</div>
+                                        <a class="small text-body-secondary text-decoration-none" href="mailto:@s.Email">@s.Email</a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-lg-table-cell">
+                                <a class="text-body-secondary text-decoration-none" href="tel:@s.Phone">
+                                    <i class="bi bi-telephone me-1"></i>@s.Phone
+                                </a>
+                            </td>
+                            <td>
+                                @if (s.Subscribed)
+                                {
+                                    <span class="badge-soft success"><i class="bi bi-check-circle-fill"></i>Abonné</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-soft muted"><i class="bi bi-dash-circle"></i>Non abonné</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@s.Id" class="btn-action edit" title="Modifier">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button type="button" class="btn-action delete" title="Supprimer"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        data-id="@s.Id" data-name="@s.Name">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div id="noResult" class="empty-state d-none">
+            <div class="empty-icon"><i class="bi bi-search"></i></div>
+            <h5 class="fw-bold">Aucun résultat</h5>
+            <p class="text-body-secondary mb-0">Essayez avec un autre mot-clé.</p>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-body text-center p-4">
+                <div class="empty-icon" style="color:#dc2626;background:rgba(239,68,68,.12);">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h5 class="fw-bold">Confirmer la suppression</h5>
+                <p class="text-body-secondary mb-4">
+                    Voulez-vous vraiment supprimer <strong id="deleteName"></strong> ?
+                    Cette action est définitive.
+                </p>
+                <form asp-action="Delete" method="post" class="d-flex gap-2 justify-content-center">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger fw-semibold">
+                        <i class="bi bi-trash3 me-1"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            document.getElementById('deleteId').value = button.getAttribute('data-id');
+            document.getElementById('deleteName').textContent = button.getAttribute('data-name');
+        });
+
+        var searchInput = document.getElementById('studentSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                var query = searchInput.value.trim().toLowerCase();
+                var visible = 0;
+                document.querySelectorAll('.student-row').forEach(function (row) {
+                    var match = row.getAttribute('data-search').indexOf(query) !== -1;
+                    row.classList.toggle('d-none', !match);
+                    if (match) { visible++; }
+                });
+                document.getElementById('resultCount').textContent = visible;
+                document.getElementById('noResult').classList.toggle('d-none', visible !== 0);
+            });
         }
-    </tbody>
-</table>
+    </script>
+}

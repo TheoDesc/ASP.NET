@@ -3,12 +3,29 @@
     ViewData["Title"] = "Nouvel étudiant";
 }
 
-<h1>Nouvel étudiant</h1>
-<form asp-action="Create" method="post" novalidate>
-    <partial name="_StudentForm" model="Model" />
-    <button type="submit" class="btn btn-success">Créer</button>
-    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
-</form>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i>Retour à la liste</a>
+
+        <div class="app-card form-card fade-up">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="icon-bubble"><i class="bi bi-person-plus"></i></span>
+                <div>
+                    <h1 class="h4 fw-bold mb-0">Nouvel étudiant</h1>
+                    <p class="text-body-secondary small mb-0">Renseignez les informations de l'étudiant.</p>
+                </div>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <partial name="_StudentForm" model="Model" />
+                <div class="d-flex gap-2 justify-content-end">
+                    <a asp-action="Index" class="btn btn-ghost">Annuler</a>
+                    <button type="submit" class="btn btn-brand"><i class="bi bi-check-lg me-1"></i>Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

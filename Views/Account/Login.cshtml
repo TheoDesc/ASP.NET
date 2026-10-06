@@ -1,0 +1,53 @@
+﻿@model StudentManager.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="auth-card app-card fade-up">
+    <div class="text-center mb-4">
+        <span class="auth-icon"><i class="bi bi-box-arrow-in-right"></i></span>
+        <h1 class="h3 fw-bold mt-3 mb-1">Bon retour !</h1>
+        <p class="text-body-secondary mb-0">Connectez-vous pour accéder à vos étudiants.</p>
+    </div>
+
+    <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input asp-for="Email" class="form-control" placeholder="vous@exemple.fr" autocomplete="username" />
+            </div>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input asp-for="Password" class="form-control" placeholder="Votre mot de passe" autocomplete="current-password" />
+                <button type="button" class="btn btn-ghost toggle-password" tabindex="-1" aria-label="Afficher le mot de passe">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-4">
+            <input asp-for="RememberMe" class="form-check-input" />
+            <label asp-for="RememberMe" class="form-check-label"></label>
+        </div>
+
+        <button type="submit" class="btn btn-brand w-100 py-2">Se connecter</button>
+    </form>
+
+    <p class="text-center text-body-secondary mt-4 mb-0">
+        Pas encore de compte ?
+        <a asp-action="Register" class="fw-semibold text-decoration-none">Créer un compte</a>
+    </p>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

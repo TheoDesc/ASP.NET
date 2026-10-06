@@ -3,12 +3,29 @@
     ViewData["Title"] = "Modifier l'étudiant";
 }
 
-<h1>Modifier l'étudiant</h1>
-<form asp-action="Edit" method="post">
-    <partial name="_StudentForm" model="Model" />
-    <button type="submit" class="btn btn-success">Enregistrer</button>
-    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
-</form>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i>Retour à la liste</a>
+
+        <div class="app-card form-card fade-up">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="icon-bubble"><i class="bi bi-pencil-square"></i></span>
+                <div>
+                    <h1 class="h4 fw-bold mb-0">Modifier l'étudiant</h1>
+                    <p class="text-body-secondary small mb-0">Mettez à jour les informations de @Model.Name.</p>
+                </div>
+            </div>
+
+            <form asp-action="Edit" method="post">
+                <partial name="_StudentForm" model="Model" />
+                <div class="d-flex gap-2 justify-content-end">
+                    <a asp-action="Index" class="btn btn-ghost">Annuler</a>
+                    <button type="submit" class="btn btn-brand"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

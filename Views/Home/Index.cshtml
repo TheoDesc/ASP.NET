@@ -1,69 +1,42 @@
-﻿@model IEnumerable<StudentManager.Models.Entities.Student>
-@{
-    ViewData["Title"] = "Étudiants";
+﻿@{
+    ViewData["Title"] = "Accueil";
+    var fullName = ViewData["FullName"] as string;
 }
 
-<h1>Liste des étudiants</h1>
-<a asp-action="Create" class="btn btn-primary mb-3">Ajouter un étudiant</a>
+<section class="hero fade-up">
+    <span class="hero-badge"><i class="bi bi-stars"></i> Gestion simple et rapide</span>
+    <h1>Bienvenue@(string.IsNullOrWhiteSpace(fullName) ? "" : " " + fullName)</h1>
+    <p>Ajoutez, modifiez et retrouvez vos étudiants en quelques clics, dans une interface claire et rapide.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a asp-controller="Students" asp-action="Index" class="btn btn-light btn-lg">
+            <i class="bi bi-people me-2"></i>Voir les étudiants
+        </a>
+        <a asp-controller="Students" asp-action="Create" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-plus-lg me-2"></i>Ajouter un étudiant
+        </a>
+    </div>
+</section>
 
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.Name)</th>
-            <th>@Html.DisplayNameFor(m => m.Email)</th>
-            <th>@Html.DisplayNameFor(m => m.Phone)</th>
-            <th>@Html.DisplayNameFor(m => m.Subscribed)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var s in Model)
-        {
-            <tr>
-                <td>@s.Name</td>
-                <td>@s.Email</td>
-                <td>@s.Phone</td>
-                <td>@(s.Subscribed ? "Oui" : "Non")</td>
-                <td class="text-end">
-                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-warning">Modifier</a>
-                    <button type="button" class="btn btn-sm btn-danger"
-                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                            data-id="@s.Id" data-name="@s.Name">
-                        Supprimer
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                Voulez-vous vraiment supprimer <strong id="deleteName"></strong> ?
-            </div>
-            <div class="modal-footer">
-                <form asp-action="Delete" method="post">
-                    <input type="hidden" name="id" id="deleteId" />
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                </form>
-            </div>
+<div class="row g-4 mt-2">
+    <div class="col-md-4 fade-up delay-1">
+        <div class="app-card feature">
+            <span class="icon-bubble"><i class="bi bi-ui-checks-grid"></i></span>
+            <h5>CRUD complet</h5>
+            <p>Créer, lire, modifier et supprimer, avec une confirmation avant chaque suppression.</p>
+        </div>
+    </div>
+    <div class="col-md-4 fade-up delay-2">
+        <div class="app-card feature">
+            <span class="icon-bubble"><i class="bi bi-database"></i></span>
+            <h5>Données persistantes</h5>
+            <p>Tout est stocké dans une base SQLite grâce à Entity Framework Core.</p>
+        </div>
+    </div>
+    <div class="col-md-4 fade-up delay-3">
+        <div class="app-card feature">
+            <span class="icon-bubble"><i class="bi bi-shield-lock"></i></span>
+            <h5>Accès sécurisé</h5>
+            <p>Seuls les utilisateurs connectés accèdent à l'application, grâce à ASP.NET Core Identity.</p>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.getElementById('deleteModal').addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            document.getElementById('deleteId').value = button.getAttribute('data-id');
-            document.getElementById('deleteName').textContent = button.getAttribute('data-name');
-        });
-    </script>
-}
